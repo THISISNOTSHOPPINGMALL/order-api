@@ -31,7 +31,7 @@ class ReactiveQueryConfiguration {
         private val internalProps = Properties(persistenceUnitInfo.properties).apply {
             putAll(jpaPropertyMap)
             setProperty(Settings.SQL_CLIENT_POOL, MysqlConnectionPool::class.qualifiedName)
-            setProperty(Settings.SQL_CLIENT_POOL_CONFIG, VertxH2DBConnectionPoolConfiguration::class.qualifiedName)
+            setProperty(Settings.SQL_CLIENT_POOL_CONFIG, VertxMySqlonnectionPoolConfiguration::class.qualifiedName)
             setProperty(Settings.URL, persistenceUnitInfo.nonJtaDataSource.unwrap(HikariDataSource::class.java).jdbcUrl)
             setProperty(Settings.USER, persistenceUnitInfo.nonJtaDataSource.unwrap(HikariDataSource::class.java).username)
             setProperty(Settings.PASS, persistenceUnitInfo.nonJtaDataSource.unwrap(HikariDataSource::class.java).password)

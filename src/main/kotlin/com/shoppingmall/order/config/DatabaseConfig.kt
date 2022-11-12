@@ -31,7 +31,7 @@ class MysqlConnectionPool : DefaultSqlClientPool() {
     }
 }
 
-class VertxH2DBConnectionPoolConfiguration : DefaultSqlClientPoolConfiguration() {
+class VertxMySqlonnectionPoolConfiguration : DefaultSqlClientPoolConfiguration() {
     private lateinit var user: String
     private var pass: String? = null
     private var cacheMaxSize: Int? = null
