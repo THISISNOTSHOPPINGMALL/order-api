@@ -21,6 +21,8 @@ enum class GlobalMessage(
     REQUEST_NOT_VALID(HttpStatus.BAD_REQUEST, "요청이 잘못되었습니다."),
     ALREADY_EXIST_ITEM_IN_CART(HttpStatus.CONFLICT, "장바구니에 이미 존재하는 상품입니다."),
 
+    NOT_FOUND_CART(HttpStatus.NOT_FOUND, "해당 회원 아이디와 상품 아이디의 장바구니가 없습니다."),
+
     ;
 
     override fun getName(): String = this.name

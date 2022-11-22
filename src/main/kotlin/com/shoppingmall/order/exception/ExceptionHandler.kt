@@ -57,7 +57,6 @@ class ExceptionHandler(
                 ).also {
                     logger.error(throwable.javaClass.simpleName, throwable)
                 }
-
         }
 
     }

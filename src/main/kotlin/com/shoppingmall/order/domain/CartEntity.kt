@@ -27,9 +27,8 @@ data class CartEntity(
     var deletedAt: LocalDateTime? = null
 ) {
 
-    fun updateAmount(amount: Int): CartEntity {
+    fun updateAmount(amount: Int): CartEntity = apply {
         this.amount = amount
-        return this
     }
 
 }

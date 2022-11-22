@@ -3,11 +3,9 @@ package com.shoppingmall.order.controller
 import com.shoppingmall.order.dto.BaseResponse
 import com.shoppingmall.order.dto.CartDto
 import com.shoppingmall.order.service.CartService
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import java.net.URI
 
 private const val SHOP_USER_ID_HEADER_NAME = "x-shop-user-id"
 
@@ -33,7 +31,20 @@ class CartController(private val cartService: CartService) {
         @RequestParam("offset") offset: Int? = 0,
         @RequestParam("limit") limit: Int? = 10,
     ): ResponseEntity<BaseResponse<List<CartDto.Response.Simple>>> =
-        cartService.findCartListByUserId(userId = userId)
+        cartService.findCartListByUserId(userId = userId, offset = offset ?: 0, limit = limit ?: 10)
+            .let {
+                ResponseEntity
+                    .ok(
+                        BaseResponse(it)
+                    )
+            }
+
+    @DeleteMapping("/{cartId}")
+    suspend fun deleteCart(
+        @RequestHeader(name = SHOP_USER_ID_HEADER_NAME) userId: String,
+        @PathVariable("cartId") cartId: Long
+    ): ResponseEntity<BaseResponse<Int>> =
+        cartService.deleteCart(cartId = cartId, userId = userId)
             .let {
                 ResponseEntity
                     .ok(
