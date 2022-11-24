@@ -7,12 +7,11 @@ import com.shoppingmall.order.domain.CartEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import org.hibernate.reactive.mutiny.Mutiny.SessionFactory
 import org.springframework.stereotype.Repository
-import javax.persistence.EntityManager
 
 interface CartRepository {
     suspend fun create(cart: CartEntity): CartEntity
     suspend fun update(userId: String, itemId: Long, amount: Int): Int
-    suspend fun findByUserId(userId: String, offset: Int, limit: Int): List<CartEntity>
+    suspend fun findAllByUserId(userId: String, offset: Int, limit: Int): List<CartEntity>
     suspend fun findByUserIdAndItemId(userId: String, itemId: Long): CartEntity?
 
     suspend fun findByCartIdAndUserId(cartId: Long, userId: String): CartEntity?
@@ -23,12 +22,10 @@ interface CartRepository {
 @Repository
 class CartRepositoryImpl(
     private val sessionFactory: SessionFactory,
-    private val entityManager: EntityManager,
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) : CartRepository {
     override suspend fun create(cart: CartEntity): CartEntity =
         cart.also {
-//            entityManager.persist(it)
             sessionFactory.withSession { session -> session.persist(it).flatMap { session.flush() } }
                 .awaitSuspending()
         }
@@ -45,7 +42,7 @@ class CartRepositoryImpl(
     }
 
 
-    override suspend fun findByUserId(userId: String, offset: Int, limit: Int): List<CartEntity> =
+    override suspend fun findAllByUserId(userId: String, offset: Int, limit: Int): List<CartEntity> =
         queryFactory.listQuery {
             select(entity(CartEntity::class))
             from(CartEntity::class)
@@ -55,6 +52,7 @@ class CartRepositoryImpl(
                     col(CartEntity::deletedAt).equal(nullLiteral())
                 )
             )
+            orderBy(col(CartEntity::createdAt).desc())
             limit(offset = offset, maxResults = limit)
         }
 
@@ -76,7 +74,7 @@ class CartRepositoryImpl(
             from(entity(CartEntity::class))
             where(
                 and(
-                    col(CartEntity::id).equal(cartId),
+                    col(CartEntity::cartId).equal(cartId),
                     col(CartEntity::userId).equal(userId),
                     col(CartEntity::deletedAt).equal(nullLiteral())
                 )
@@ -85,7 +83,7 @@ class CartRepositoryImpl(
 
     override suspend fun delete(cartId: Long): Int = queryFactory.deleteQuery<CartEntity> {
         where(
-            col(CartEntity::id).equal(cartId)
+            col(CartEntity::cartId).equal(cartId)
         )
     }
 

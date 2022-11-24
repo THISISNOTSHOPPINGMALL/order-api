@@ -41,7 +41,7 @@ class CartService(
 
     @Transactional(readOnly = true)
     suspend fun findCartListByUserId(userId: String, offset: Int, limit: Int): List<CartDto.Response.Simple> =
-        cartRepository.findByUserId(userId = userId, offset = offset, limit = limit)
+        cartRepository.findAllByUserId(userId = userId, offset = offset, limit = limit)
             .map { CartDto.Response.Simple.from(it) }
 
     @Transactional
