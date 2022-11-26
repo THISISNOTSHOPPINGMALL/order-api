@@ -6,12 +6,12 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "item_of_order")
-data class ItemOfOrderEntity(
+data class OrderItemEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_of_order_id")
-    val itemOfOrderId: Long = 0,
+    @Column(name = "order_item_id")
+    val orderItemId: Long = 0,
 
     @Column(name = "order_id")
     val orderId: Long,

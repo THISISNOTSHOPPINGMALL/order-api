@@ -1,21 +1,29 @@
 package com.shoppingmall.order.dto
 
-import com.shoppingmall.order.domain.ItemOfOrderEntity
+import com.shoppingmall.order.domain.OrderItemEntity
 
-class ItemOfOrderDto {
+class OrderItemDto {
+
+    class Request {
+        data class Add(
+            val itemId: Long,
+            val price: Long,
+            val amount: Long
+        )
+    }
 
     class Response {
 
         data class Simple(
-            val itemOfOrderId: Long,
+            val OrderItemId: Long,
             val orderId: Long,
             val itemId: Long,
             val price: Long,
             val amount: Long
         ) {
             companion object {
-                fun from(entity: ItemOfOrderEntity): Simple = Simple(
-                    itemOfOrderId = entity.itemOfOrderId,
+                fun from(entity: OrderItemEntity): Simple = Simple(
+                    OrderItemId = entity.orderItemId,
                     orderId = entity.orderId,
                     itemId = entity.itemId,
                     price = entity.price,

@@ -25,7 +25,7 @@ class MysqlConnectionPool : DefaultSqlClientPool() {
                 .setJdbcUrl(connectOptions.host)
                 .setUser(connectOptions.user)
                 .setPassword(connectOptions.password)
-                .setDatabase(connectOptions.database),
+                .setDatabase("mysql"),
             poolOptions
         )
     }
@@ -41,6 +41,7 @@ class VertxMySqlonnectionPoolConfiguration : DefaultSqlClientPoolConfiguration()
             return SqlConnectOptions()
                 .setHost("jdbc:$uri")
                 .setUser(user)
+                .setDatabase("mysql")
                 .apply {
                     pass?.let { password = it }
                     //enable the prepared statement cache by default

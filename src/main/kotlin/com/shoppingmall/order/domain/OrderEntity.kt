@@ -45,5 +45,9 @@ data class OrderEntity(
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
     @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null,
+
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    val items: List<OrderItemEntity> = emptyList()
 )

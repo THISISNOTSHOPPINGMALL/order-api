@@ -26,8 +26,17 @@ class CartRepositoryImpl(
 ) : CartRepository {
     override suspend fun create(cart: CartEntity): CartEntity =
         cart.also {
-            sessionFactory.withSession { session -> session.persist(it).flatMap { session.flush() } }
-                .awaitSuspending()
+            queryFactory.transactionWithFactory { session, factory ->
+                session.persist(cart).awaitSuspending()
+                session.flush().awaitSuspending()
+
+//                factory.singleQuery<OrderEntity> {
+//                    select(entity(OrderEntity::class))
+//                    from(entity(OrderEntity::class))
+//                    orderBy(col(OrderEntity::createdAt).desc())
+//                    limit(1)
+//                }
+            }
         }
 
     override suspend fun update(userId: String, itemId: Long, amount: Int): Int = queryFactory.updateQuery<CartEntity> {

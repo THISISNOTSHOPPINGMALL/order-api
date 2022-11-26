@@ -24,12 +24,13 @@ class CartService(
         return if (cartEntity == null) {
             CartEntity(userId = userId, itemId = req.itemId, amount = req.amount)
                 .let {
-                    try { // TODO: 쿼리는 나가지만, 응답 값을 받는 데에서 익셉션 발생 추후 처리
-                        cartRepository.create(it)
-                    } catch (e: Exception) {
-                        cartRepository.findByUserIdAndItemId(userId = userId, itemId = req.itemId)
-                            ?: throw GlobalException(GlobalMessage.NOT_FOUND_CART)
-                    }
+                    cartRepository.create(it)
+//                    try { // TODO: 쿼리는 나가지만, 응답 값을 받는 데에서 익셉션 발생 추후 처리
+//                        cartRepository.create(it)
+//                    } catch (e: Exception) {
+//                        cartRepository.findByUserIdAndItemId(userId = userId, itemId = req.itemId)
+//                            ?: throw GlobalException(GlobalMessage.NOT_FOUND_CART)
+//                    }
                 }
         } else {
             cartRepository.update(userId = userId, itemId = req.itemId, amount = req.amount)

@@ -10,7 +10,7 @@ class OrderDto {
 
         data class Add(
             val address: String,
-            val itemIdList: List<Long>
+            val itemIdList: List<OrderItemDto.Request.Add>
         )
 
     }
@@ -26,10 +26,10 @@ class OrderDto {
             val waybillNum: String?,
             val paymentId: Long?,
             val createdAt: LocalDateTime,
-            val itemList: List<ItemOfOrderDto.Response.Simple>
+            val itemList: List<OrderItemDto.Response.Simple>
         ) {
             companion object {
-                fun from(order: OrderEntity, itemList: List<ItemOfOrderDto.Response.Simple>) = Simple(
+                fun from(order: OrderEntity) = Simple(
                     orderId = order.orderId!!,
                     userId = order.userId,
                     status = order.status,
@@ -38,7 +38,7 @@ class OrderDto {
                     waybillNum = order.waybillNum,
                     paymentId = order.paymentId,
                     createdAt = order.createdAt,
-                    itemList = itemList
+                    itemList = order.items.map { OrderItemDto.Response.Simple.from(it) }
                 )
             }
         }

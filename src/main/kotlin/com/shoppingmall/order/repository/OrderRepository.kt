@@ -6,6 +6,7 @@ import com.linecorp.kotlinjdsl.spring.data.reactive.query.SpringDataHibernateMut
 import com.linecorp.kotlinjdsl.spring.data.reactive.query.listQuery
 import com.linecorp.kotlinjdsl.spring.data.reactive.query.singleQueryOrNull
 import com.shoppingmall.order.domain.OrderEntity
+import com.shoppingmall.order.domain.OrderItemEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import org.hibernate.reactive.mutiny.Mutiny
 import org.springframework.stereotype.Repository
@@ -17,8 +18,10 @@ class OrderRepository(
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) {
     suspend fun create(order: OrderEntity): OrderEntity = order.also {
-        sessionFactory.withSession { session -> session.persist(it).flatMap { session.flush() } }
-            .awaitSuspending()
+        queryFactory.withFactory { session, factory ->
+            session.persist(order).awaitSuspending()
+            session.flush().awaitSuspending()
+        }
     }
 
     suspend fun findByOrderIdAndUserId(orderId: Long, userId: String): OrderEntity? = queryFactory.singleQueryOrNull {
@@ -37,6 +40,7 @@ class OrderRepository(
         queryFactory.listQuery {
             select(entity(OrderEntity::class))
             from(OrderEntity::class)
+            fetch(OrderEntity::class, OrderItemEntity::class, on(OrderEntity::items))
             where(
                 and(
                     col(OrderEntity::userId).equal(userId),
