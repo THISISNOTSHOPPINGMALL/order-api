@@ -2,10 +2,15 @@ package com.shoppingmall.order.repository
 
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.expression.nullLiteral
-import com.linecorp.kotlinjdsl.spring.data.reactive.query.*
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.SpringDataHibernateMutinyReactiveQueryFactory
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.listQuery
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.singleQueryOrNull
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.updateQuery
 import com.shoppingmall.order.domain.CartEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 interface CartRepository {
     suspend fun create(cart: CartEntity): CartEntity
@@ -81,7 +86,8 @@ class CartRepositoryImpl(
             )
         }
 
-    override suspend fun delete(cartId: Long): Int = queryFactory.deleteQuery<CartEntity> {
+    override suspend fun delete(cartId: Long): Int = queryFactory.updateQuery<CartEntity> {
+        set(col(CartEntity::deletedAt), LocalDateTime.now(ZoneId.of("Asia/Seoul")))
         where(
             col(CartEntity::cartId).equal(cartId)
         )
