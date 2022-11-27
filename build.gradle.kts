@@ -42,13 +42,13 @@ dependencies {
 
     // reactive
     implementation("com.linecorp.kotlin-jdsl:spring-data-kotlin-jdsl-hibernate-reactive:$jdslVersion")
-    implementation("org.hibernate.reactive:hibernate-reactive-core:1.1.6.Final")
+    implementation("org.hibernate.reactive:hibernate-reactive-core:1.1.9.Final")
     implementation("io.smallrye.reactive:mutiny-kotlin:1.6.0")
 
     // mysql
     implementation("io.agroal:agroal-pool:2.0")
     implementation("mysql:mysql-connector-java")
-    implementation("io.vertx:vertx-jdbc-client:4.3.1")
+    implementation("io.vertx:vertx-mysql-client:4.3.1")
 }
 
 tasks.withType<KotlinCompile> {
