@@ -8,13 +8,11 @@ import com.linecorp.kotlinjdsl.spring.data.reactive.query.singleQueryOrNull
 import com.shoppingmall.order.domain.OrderEntity
 import com.shoppingmall.order.domain.OrderItemEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
-import org.hibernate.reactive.mutiny.Mutiny
 import org.springframework.stereotype.Repository
 
 
 @Repository
 class OrderRepository(
-    private val sessionFactory: Mutiny.SessionFactory,
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) {
     suspend fun create(order: OrderEntity): OrderEntity = order.also {
@@ -27,6 +25,7 @@ class OrderRepository(
     suspend fun findByOrderIdAndUserId(orderId: Long, userId: String): OrderEntity? = queryFactory.singleQueryOrNull {
         select(entity(OrderEntity::class))
         from(OrderEntity::class)
+        fetch(OrderEntity::class, OrderItemEntity::class, on(OrderEntity::items))
         where(
             and(
                 col(OrderEntity::orderId).equal(orderId),

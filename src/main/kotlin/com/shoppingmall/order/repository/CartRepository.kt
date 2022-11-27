@@ -5,7 +5,6 @@ import com.linecorp.kotlinjdsl.querydsl.expression.nullLiteral
 import com.linecorp.kotlinjdsl.spring.data.reactive.query.*
 import com.shoppingmall.order.domain.CartEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
-import org.hibernate.reactive.mutiny.Mutiny.SessionFactory
 import org.springframework.stereotype.Repository
 
 interface CartRepository {
@@ -21,7 +20,6 @@ interface CartRepository {
 
 @Repository
 class CartRepositoryImpl(
-    private val sessionFactory: SessionFactory,
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) : CartRepository {
     override suspend fun create(cart: CartEntity): CartEntity =
@@ -29,13 +27,6 @@ class CartRepositoryImpl(
             queryFactory.transactionWithFactory { session, factory ->
                 session.persist(cart).awaitSuspending()
                 session.flush().awaitSuspending()
-
-//                factory.singleQuery<OrderEntity> {
-//                    select(entity(OrderEntity::class))
-//                    from(entity(OrderEntity::class))
-//                    orderBy(col(OrderEntity::createdAt).desc())
-//                    limit(1)
-//                }
             }
         }
 
