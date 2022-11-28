@@ -4,20 +4,23 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import javax.persistence.*
 
-
 @Entity
-@Table(name = "cart")
-data class CartEntity(
+@Table(name = "item_of_order")
+data class OrderItemEntity(
+
     @Id
-    @Column(name = "cart_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val cartId: Long = 0,
-    @Column(name = "user_id")
-    val userId: String,
+    @Column(name = "order_item_id")
+    val orderItemId: Long = 0,
+
+    @Column(name = "order_id")
+    val orderId: Long,
     @Column(name = "item_id")
     val itemId: Long,
+    @Column(name = "price")
+    val price: Long,
     @Column(name = "amount")
-    var amount: Int = 1,
+    val amount: Long,
 
     @Column(name = "created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul")),
@@ -25,10 +28,4 @@ data class CartEntity(
     var updatedAt: LocalDateTime? = null,
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null
-) {
-
-    fun updateAmount(amount: Int): CartEntity = apply {
-        this.amount = amount
-    }
-
-}
+)

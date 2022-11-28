@@ -2,17 +2,20 @@ package com.shoppingmall.order.repository
 
 import com.linecorp.kotlinjdsl.querydsl.expression.col
 import com.linecorp.kotlinjdsl.querydsl.expression.nullLiteral
-import com.linecorp.kotlinjdsl.spring.data.reactive.query.*
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.SpringDataHibernateMutinyReactiveQueryFactory
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.listQuery
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.singleQueryOrNull
+import com.linecorp.kotlinjdsl.spring.data.reactive.query.updateQuery
 import com.shoppingmall.order.domain.CartEntity
 import io.smallrye.mutiny.coroutines.awaitSuspending
-import org.hibernate.reactive.mutiny.Mutiny.SessionFactory
 import org.springframework.stereotype.Repository
-import javax.persistence.EntityManager
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 interface CartRepository {
     suspend fun create(cart: CartEntity): CartEntity
     suspend fun update(userId: String, itemId: Long, amount: Int): Int
-    suspend fun findByUserId(userId: String, offset: Int, limit: Int): List<CartEntity>
+    suspend fun findAllByUserId(userId: String, offset: Int, limit: Int): List<CartEntity>
     suspend fun findByUserIdAndItemId(userId: String, itemId: Long): CartEntity?
 
     suspend fun findByCartIdAndUserId(cartId: Long, userId: String): CartEntity?
@@ -22,15 +25,14 @@ interface CartRepository {
 
 @Repository
 class CartRepositoryImpl(
-    private val sessionFactory: SessionFactory,
-    private val entityManager: EntityManager,
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) : CartRepository {
     override suspend fun create(cart: CartEntity): CartEntity =
         cart.also {
-//            entityManager.persist(it)
-            sessionFactory.withSession { session -> session.persist(it).flatMap { session.flush() } }
-                .awaitSuspending()
+            queryFactory.transactionWithFactory { session, factory ->
+                session.persist(cart).awaitSuspending()
+                session.flush().awaitSuspending()
+            }
         }
 
     override suspend fun update(userId: String, itemId: Long, amount: Int): Int = queryFactory.updateQuery<CartEntity> {
@@ -45,7 +47,7 @@ class CartRepositoryImpl(
     }
 
 
-    override suspend fun findByUserId(userId: String, offset: Int, limit: Int): List<CartEntity> =
+    override suspend fun findAllByUserId(userId: String, offset: Int, limit: Int): List<CartEntity> =
         queryFactory.listQuery {
             select(entity(CartEntity::class))
             from(CartEntity::class)
@@ -55,6 +57,7 @@ class CartRepositoryImpl(
                     col(CartEntity::deletedAt).equal(nullLiteral())
                 )
             )
+            orderBy(col(CartEntity::createdAt).desc())
             limit(offset = offset, maxResults = limit)
         }
 
@@ -76,16 +79,17 @@ class CartRepositoryImpl(
             from(entity(CartEntity::class))
             where(
                 and(
-                    col(CartEntity::id).equal(cartId),
+                    col(CartEntity::cartId).equal(cartId),
                     col(CartEntity::userId).equal(userId),
                     col(CartEntity::deletedAt).equal(nullLiteral())
                 )
             )
         }
 
-    override suspend fun delete(cartId: Long): Int = queryFactory.deleteQuery<CartEntity> {
+    override suspend fun delete(cartId: Long): Int = queryFactory.updateQuery<CartEntity> {
+        set(col(CartEntity::deletedAt), LocalDateTime.now(ZoneId.of("Asia/Seoul")))
         where(
-            col(CartEntity::id).equal(cartId)
+            col(CartEntity::cartId).equal(cartId)
         )
     }
 
