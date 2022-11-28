@@ -11,7 +11,7 @@ data class OrderItemEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
-    val orderItemId: Long = 0,
+    val orderItemId: Long? = null,
 
     @Column(name = "order_id")
     val orderId: Long,

@@ -21,7 +21,7 @@ class CartDto {
         ) {
             companion object {
                 fun from(cart: CartEntity): Simple =
-                    Simple(cartId = cart.cartId, userId = cart.userId, itemId = cart.itemId, amount = cart.amount)
+                    Simple(cartId = cart.cartId!!, userId = cart.userId, itemId = cart.itemId, amount = cart.amount)
             }
         }
     }

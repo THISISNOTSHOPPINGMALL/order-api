@@ -23,9 +23,9 @@ class OrderService(
         val order = OrderEntity(
             userId = userId,
             status = OrderStatus.BEFORE_PAYMENT,
-            address = req.address
+            address = req.address,
         ).also {
-            orderRepository.create(it)
+            orderRepository.save(it)
         }
 
         req.itemIdList.map {
@@ -36,12 +36,8 @@ class OrderService(
                 price = it.price,
                 amount = it.amount
             )
-        }.forEach {
-            try {
-                itemOfOrderRepository.create(it)
-            } catch (e: Exception) {
-                Unit
-            }
+        }.also {
+            itemOfOrderRepository.saveAll(it)
         }
 
         return orderRepository.findAllByUserId(userId = userId, limit = 1, offset = 0).first()

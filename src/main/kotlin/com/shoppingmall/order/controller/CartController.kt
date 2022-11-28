@@ -43,12 +43,12 @@ class CartController(private val cartService: CartService) {
     suspend fun deleteCart(
         @RequestHeader(name = SHOP_USER_ID_HEADER_NAME) userId: String,
         @PathVariable("cartId") cartId: Long
-    ): ResponseEntity<BaseResponse<Int>> =
+    ): ResponseEntity<BaseResponse<Long>> =
         cartService.deleteCart(cartId = cartId, userId = userId)
             .let {
                 ResponseEntity
                     .ok(
-                        BaseResponse(it)
+                        BaseResponse(data = it)
                     )
             }
 
