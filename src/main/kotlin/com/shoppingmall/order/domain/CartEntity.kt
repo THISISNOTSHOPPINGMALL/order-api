@@ -11,7 +11,7 @@ data class CartEntity(
     @Id
     @Column(name = "cart_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val cartId: Long = 0,
+    val cartId: Long? = null,
     @Column(name = "user_id")
     val userId: String,
     @Column(name = "item_id")
@@ -29,6 +29,10 @@ data class CartEntity(
 
     fun updateAmount(amount: Int): CartEntity = apply {
         this.amount = amount
+    }
+
+    fun delete() = apply {
+        this.deletedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
     }
 
 }

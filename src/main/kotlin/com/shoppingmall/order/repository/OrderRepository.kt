@@ -15,10 +15,15 @@ import org.springframework.stereotype.Repository
 class OrderRepository(
     private val queryFactory: SpringDataHibernateMutinyReactiveQueryFactory
 ) {
-    suspend fun create(order: OrderEntity): OrderEntity = order.also {
+    suspend fun save(order: OrderEntity): OrderEntity = order.also {
         queryFactory.withFactory { session, factory ->
-            session.persist(order).awaitSuspending()
-            session.flush().awaitSuspending()
+            if (order.orderId == null) { // save
+                session.persist(it)
+            } else { // update
+                session.merge(it)
+            }
+                .flatMap { session.flush() }
+                .awaitSuspending()
         }
     }
 

@@ -21,34 +21,21 @@ class CartService(
 
         val cartEntity: CartEntity? = cartRepository.findByUserIdAndItemId(userId = userId, itemId = req.itemId)
 
-        return if (cartEntity == null) {
-            CartEntity(userId = userId, itemId = req.itemId, amount = req.amount)
-                .let {
-                    cartRepository.create(it)
-//                    try { // TODO: 쿼리는 나가지만, 응답 값을 받는 데에서 익셉션 발생 추후 처리
-//                        cartRepository.create(it)
-//                    } catch (e: Exception) {
-//                        cartRepository.findByUserIdAndItemId(userId = userId, itemId = req.itemId)
-//                            ?: throw GlobalException(GlobalMessage.NOT_FOUND_CART)
-//                    }
-                }
-        } else {
-            cartRepository.update(userId = userId, itemId = req.itemId, amount = req.amount)
-            cartEntity.updateAmount(amount = req.amount)
-        }.let {
-            CartDto.Response.Simple.from(it)
-        }
+        return (cartEntity
+            ?.updateAmount(amount = req.amount)
+            ?: CartEntity(userId = userId, itemId = req.itemId, amount = req.amount)
+                .let { cartRepository.save(it) })
+            .let { CartDto.Response.Simple.from(it) }
     }
 
-    @Transactional(readOnly = true)
     suspend fun findCartListByUserId(userId: String, offset: Int, limit: Int): List<CartDto.Response.Simple> =
         cartRepository.findAllByUserId(userId = userId, offset = offset, limit = limit)
             .map { CartDto.Response.Simple.from(it) }
 
     @Transactional
-    suspend fun deleteCart(cartId: Long, userId: String): Int =
+    suspend fun deleteCart(cartId: Long, userId: String): Long =
         cartRepository.findByCartIdAndUserId(cartId = cartId, userId = userId)
-            ?.let { cartRepository.delete(cartId = cartId) }
+            ?.let { cartRepository.save(it.delete()).cartId }
             ?: throw GlobalException(GlobalMessage.NOT_FOUND_CART)
 
 

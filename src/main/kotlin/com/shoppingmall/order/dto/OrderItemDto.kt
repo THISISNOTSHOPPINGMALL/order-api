@@ -23,7 +23,7 @@ class OrderItemDto {
         ) {
             companion object {
                 fun from(entity: OrderItemEntity): Simple = Simple(
-                    OrderItemId = entity.orderItemId,
+                    OrderItemId = entity.orderItemId!!,
                     orderId = entity.orderId,
                     itemId = entity.itemId,
                     price = entity.price,
